@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"image/draw"
+	"image/jpeg"
 	"os"
 )
 
@@ -11,7 +12,7 @@ type Pictures struct {
 	image.Image
 }
 
-func Open(filename string) (*Pictures, error) {
+func FromPath(filename string) (*Pictures, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -26,7 +27,7 @@ func Open(filename string) (*Pictures, error) {
 	return &Pictures{Image: img}, nil
 }
 
-func File(file *os.File) (*Pictures, error) {
+func FromFile(file *os.File) (*Pictures, error) {
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return nil, err
@@ -35,7 +36,7 @@ func File(file *os.File) (*Pictures, error) {
 	return &Pictures{Image: img}, nil
 }
 
-func Bytes(byts []byte) (*Pictures, error) {
+func FromBytes(byts []byte) (*Pictures, error) {
 	img, _, err := image.Decode(bytes.NewReader(byts))
 	if err != nil {
 		return nil, err
@@ -44,13 +45,23 @@ func Bytes(byts []byte) (*Pictures, error) {
 	return &Pictures{Image: img}, nil
 }
 
-func (p *Pictures) Save(filename string, encoder Encoder) error {
+func (p *Pictures) ToFile(filename string, encoder Encoder) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 	return encoder(f, p.Image)
+}
+
+func (p *Pictures) ToBytes() ([]byte, error) {
+	buf := new(bytes.Buffer)
+
+	if err := jpeg.Encode(buf, p.Image, nil); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 func (p *Pictures) Crop(x0, y0, x1, y1 int) *Pictures {
