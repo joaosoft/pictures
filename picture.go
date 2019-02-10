@@ -1,6 +1,7 @@
 package pictures
 
 import (
+	"bytes"
 	"image"
 	"image/draw"
 	"os"
@@ -18,6 +19,24 @@ func Open(filename string) (*Pictures, error) {
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Pictures{Image: img}, nil
+}
+
+func File(file *os.File) (*Pictures, error) {
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Pictures{Image: img}, nil
+}
+
+func Bytes(byts []byte) (*Pictures, error) {
+	img, _, err := image.Decode(bytes.NewReader(byts))
 	if err != nil {
 		return nil, err
 	}
