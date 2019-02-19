@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"image"
 	"image/draw"
-	"image/jpeg"
 	"os"
 )
 
@@ -54,14 +53,12 @@ func (p *Pictures) ToFile(filename string, encoder Encoder) error {
 	return encoder(f, p.Image)
 }
 
-func (p *Pictures) ToBytes() ([]byte, error) {
+func (p *Pictures) ToBytes(encoder Encoder) ([]byte, error) {
 	buf := new(bytes.Buffer)
 
-	if err := jpeg.Encode(buf, p.Image, nil); err != nil {
-		return nil, err
-	}
+	err := encoder(buf, p.Image)
 
-	return buf.Bytes(), nil
+	return buf.Bytes(), err
 }
 
 func (p *Pictures) Crop(x0, y0, x1, y1 int) *Pictures {
