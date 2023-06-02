@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"pictures"
+	"github.com/joaosoft/pictures"
 )
 
 func main() {
